@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataManager - Управление данными</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #6b8cbc;
+            --accent-color: #ff7e5f;
+            --light-color: #f8f9fa;
+            --dark-color: #2c3e50;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f1 100%);
+            color: var(--dark-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .logo i {
+            color: var(--accent-color);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+        }
+
+        nav ul li {
+            position: relative;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--dark-color);
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        nav ul li a:hover {
+            color: var(--primary-color);
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            min-width: 200px;
+            box-shadow: var(--shadow);
+            border-radius: 8px;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .dropdown-menu a {
+            padding: 0.75rem 1rem;
+            display: block;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .dropdown-menu a:hover {
+            background: #f8f9fa;
+        }
+
+        .nav-item:hover .dropdown-menu {
+            display: block;
+        }
+
+        .auth-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .auth-btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Main Content Styles */
+        .hero {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(120deg, rgba(74, 111, 165, 0.1) 0%, rgba(107, 140, 188, 0.05) 100%);
+            min-height: 80vh;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: #555;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.9rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 126, 95, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: #ff6b4f;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 126, 95, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            width: 90%;
+            max-width: 500px;
+            transform: translateY(20px);
+            transition: var(--transition);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+        }
+
+        .modal-header h2 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #777;
+            transition: var(--transition);
+        }
+
+        .close-btn:hover {
+            color: var(--danger-color);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .btn-cancel {
+            background: #f8f9fa;
+            color: #6c757d;
+        }
+
+        .btn-cancel:hover {
+            background: #e9ecef;
+        }
+
+        .btn-submit {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-submit:hover {
+            background: var(--secondary-color);
+        }
+
+        /* Table Section */
+        .table-section {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .table-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .search-box {
+            position: relative;
+            flex-grow: 1;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 40px;
+            border: 1px solid #ddd;
+            border-radius: 50px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            background: var(--primary-color);
+            color: white;
+            text-align: left;
+            padding: 1rem;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+        .data-table tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            font-size: 1.1rem;
+            margin: 0 5px;
+            transition: var(--transition);
+        }
+
+        .action-btn:hover {
+            color: var(--secondary-color);
+            transform: scale(1.1);
+        }
+
+        .action-btn.delete {
+            color: var(--danger-color);
+        }
+
+        .action-btn.delete:hover {
+            color: #bd2130;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: rgba(40, 167, 69, 0.15);
+            color: var(--success-color);
+        }
+
+        .status-completed {
+            background: rgba(220, 53, 69, 0.15);
+            color: var(--danger-color);
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.15);
+            color: var(--warning-color);
+        }
+
+        /* Footer Styles */
+        footer {
+            background: var(--dark-color);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-card i {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .stat-card h3 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+        }
+
+        .stat-card p {
+            color: #777;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .table-section {
+                padding: 2rem 1rem;
+            }
+
+            .data-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .table-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        @media (max-width: 480px) {
+            nav ul {
+                gap: 0.75rem;
+            }
+
+            nav ul li a span {
+                display: none;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .modal {
+                width: 95%;
+            }
+
+            .stat-card {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-database"></i>
+                <span>DataManager</span>
+            </div>
+            <nav id="mainNav">
+                <ul>
+                    <li><a href="#" class="nav-link" data-page="home"><i class="fas fa-home"></i> <span>Главная</span></a></li>
+                    <li class="nav-item">
+                        <a href="#"><i class="fas fa-plus-circle"></i> <span>Действия</span></a>
+                        <div class="dropdown-menu">
+                            <a href="#" id="openAddModal"><i class="fas fa-plus"></i> Добавить запись</a>
+                            <a href="#" class="nav-link" data-page="table"><i class="fas fa-table"></i> Таблица данных</a>
+                        </div>
+                    </li>
+                    <li><a href="#" class="nav-link" data-page="table"><i class="fas fa-table"></i> <span>Таблица</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="dashboard"><i class="fas fa-chart-bar"></i> <span>Статистика</span></a></li>
+                </ul>
+            </nav>
+            <div id="authSection">
+                <button class="auth-btn" id="authButton">
+                    <i class="fas fa-user"></i>
+                    <span>Войти</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Home Page -->
+    <section class="hero" id="homePage">
+        <div class="hero-content">
+            <h1>Управляйте вашими данными с легкостью</h1>
+            <p>Минималистичный и интуитивно понятный интерфейс для работы с таблицами данных. Полностью адаптирован для всех устройств. Все изменения сохраняются автоматически.</p>
+            <div class="cta-buttons">
+                <button class="btn btn-primary" id="openModalBtn">
+                    <i class="fas fa-plus-circle"></i>
+                    Добавить запись
+                </button>
+                <button class="btn btn-secondary nav-link" data-page="table">
+                    <i class="fas fa-table"></i>
+                    Посмотреть таблицу
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Table Section -->
+    <section class="table-section" id="tablePage" style="display: none;">
+        <div class="section-header">
+            <h2>Таблица данных</h2>
+            <p>Ваши записи в удобном табличном формате. Данные сохраняются в вашем браузере.</p>
+        </div>
+        <div class="table-container">
+            <div class="table-actions">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Поиск по таблице...">
+                </div>
+                <button class="btn btn-primary" id="openTableAddModal">
+                    <i class="fas fa-plus"></i>
+                    Добавить запись
+                </button>
+            </div>
+            <table class="data-table" id="dataTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Наименование</th>
+                        <th>Категория</th>
+                        <th>Дата</th>
+                        <th>Статус</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Данные будут загружены через JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Dashboard -->
+    <section class="dashboard" id="dashboardPage">
+        <div class="section-header">
+            <h2>Статистика данных</h2>
+            <p>Аналитика и статистика ваших записей</p>
+        </div>
+        
+        <div class="stats-container">
+            <div class="stat-card">
+                <i class="fas fa-list"></i>
+                <h3 id="totalItems">0</h3>
+                <p>Всего записей</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-check-circle"></i>
+                <h3 id="activeItems">0</h3>
+                <p>Активные записи</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-tags"></i>
+                <h3 id="categoriesCount">0</h3>
+                <p>Категорий</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-calendar"></i>
+                <h3 id="todayItems">0</h3>
+                <p>Записей сегодня</p>
+            </div>
+        </div>
+        
+        <div class="section-header">
+            <h3>Последние записи</h3>
+        </div>
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Наименование</th>
+                        <th>Категория</th>
+                        <th>Дата</th>
+                        <th>Статус</th>
+                    </tr>
+                </thead>
+                <tbody id="recentItems">
+                    <!-- Данные будут загружены через JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2023 DataManager. Все права защищены.</p>
+            <p>Полностью функциональный интерфейс с сохранением данных</p>
+        </div>
+    </footer>
+
+    <!-- Add Data Modal -->
+    <div class="modal-overlay" id="addModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-plus-circle"></i> Добавить запись</h2>
+                <button class="close-btn" id="closeAddModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="itemName">Наименование *</label>
+                    <input type="text" id="itemName" class="form-control" placeholder="Введите название" required>
+                </div>
+                <div class="form-group">
+                    <label for="itemCategory">Категория *</label>
+                    <select id="itemCategory" class="form-control" required>
+                        <option value="">Выберите категорию</option>
+                        <option value="development">Разработка</option>
+                        <option value="design">Дизайн</option>
+                        <option value="testing">Тестирование</option>
+                        <option value="analytics">Аналитика</option>
+                        <option value="marketing">Маркетинг</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="itemDate">Дата *</label>
+                    <input type="date" id="itemDate" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="itemStatus">Статус *</label>
+                    <select id="itemStatus" class="form-control" required>
+                        <option value="active">Активен</option>
+                        <option value="completed">Завершен</option>
+                        <option value="pending">В ожидании</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="itemDescription">Описание</label>
+                    <textarea id="itemDescription" class="form-control" rows="3" placeholder="Дополнительная информация"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" id="cancelAdd">Отмена</button>
+                <button class="btn btn-submit" id="saveItem">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-user"></i> Авторизация</h2>
+                <button class="close-btn" id="closeAuthModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" class="form-control" placeholder="Введите ваш email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Пароль *</label>
+                    <input type="password" id="password" class="form-control" placeholder="Введите пароль" required>
+                </div>
+                <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <input type="checkbox" id="remember">
+                        <label for="remember" style="display: inline; margin-left: 5px;">Запомнить меня</label>
+                    </div>
+                    <a href="#" style="color: var(--primary-color); text-decoration: none;">Забыли пароль?</a>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" id="cancelAuth">Отмена</button>
+                <button class="btn btn-submit" id="loginBtn">Войти</button>
+            </div>
+            <div style="padding: 0 1.5rem 1.5rem; text-align: center;">
+                <p>Еще нет аккаунта? <a href="#" id="registerLink" style="color: var(--primary-color); text-decoration: none; font-weight: 500;">Зарегистрироваться</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal-overlay" id="registerModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-plus"></i> Регистрация</h2>
+                <button class="close-btn" id="closeRegisterModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="regName">Имя *</label>
+                    <input type="text" id="regName" class="form-control" placeholder="Введите ваше имя" required>
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">Email *</label>
+                    <input type="email" id="regEmail" class="form-control" placeholder="Введите ваш email" required>
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Пароль *</label>
+                    <input type="password" id="regPassword" class="form-control" placeholder="Придумайте пароль" required>
+                </div>
+                <div class="form-group">
+                    <label for="regConfirm">Подтверждение пароля *</label>
+                    <input type="password" id="regConfirm" class="form-control" placeholder="Повторите пароль" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" id="cancelRegister">Отмена</button>
+                <button class="btn btn-submit" id="registerBtn">Зарегистрироваться</button>
+            </div>
+            <div style="padding: 0 1.5rem 1.5rem; text-align: center;">
+                <p>Уже есть аккаунт? <a href="#" id="loginLink" style="color: var(--primary-color); text-decoration: none; font-weight: 500;">Войти</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Глобальные переменные
+        let currentUser = null;
+        let dataItems = [];
+        let editingItemId = null;
+
+        // Инициализация приложения
+        document.addEventListener('DOMContentLoaded', function() {
+            initApp();
+            setupEventListeners();
+            showPage('home');
+        });
+
+        // Инициализация приложения
+        function initApp() {
+            // Загрузка пользователя из LocalStorage
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                updateAuthUI();
+            }
+            
+            // Загрузка данных из LocalStorage
+            const savedData = localStorage.getItem('dataItems');
+            if (savedData) {
+                dataItems = JSON.parse(savedData);
+            } else {
+                // Начальные данные
+                dataItems = [
+                    { id: generateId(), name: "Проект Альфа", category: "Разработка", date: "2023-07-15", status: "active", description: "Разработка нового функционала" },
+                    { id: generateId(), name: "Проект Бета", category: "Дизайн", date: "2023-07-20", status: "active", description: "Дизайн интерфейса" },
+                    { id: generateId(), name: "Проект Гамма", category: "Тестирование", date: "2023-07-25", status: "completed", description: "Тестирование новой версии" },
+                    { id: generateId(), name: "Проект Дельта", category: "Аналитика", date: "2023-07-30", status: "pending", description: "Анализ пользовательского поведения" }
+                ];
+                saveData();
+            }
+            
+            renderTable();
+            updateDashboard();
+        }
+
+        // Настройка обработчиков событий
+        function setupEventListeners() {
+            // Модальные окна
+            document.getElementById('openModalBtn').addEventListener('click', openAddDataModal);
+            document.getElementById('openTableAddModal').addEventListener('click', openAddDataModal);
+            document.getElementById('openAddModal').addEventListener('click', openAddDataModal);
+            document.getElementById('closeAddModal').addEventListener('click', closeAllModals);
+            document.getElementById('cancelAdd').addEventListener('click', closeAllModals);
+            
+            document.getElementById('authButton').addEventListener('click', openAuthModal);
+            document.getElementById('closeAuthModal').addEventListener('click', closeAllModals);
+            document.getElementById('cancelAuth').addEventListener('click', closeAllModals);
+            
+            document.getElementById('registerLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                closeAllModals();
+                document.getElementById('registerModal').classList.add('active');
+            });
+            
+            document.getElementById('loginLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                closeAllModals();
+                document.getElementById('authModal').classList.add('active');
+            });
+            
+            document.getElementById('closeRegisterModal').addEventListener('click', closeAllModals);
+            document.getElementById('cancelRegister').addEventListener('click', closeAllModals);
+            
+            // Сохранение данных
+            document.getElementById('saveItem').addEventListener('click', saveDataItem);
+            
+            // Авторизация
+            document.getElementById('loginBtn').addEventListener('click', login);
+            document.getElementById('registerBtn').addEventListener('click', register);
+            
+            // Поиск
+            document.getElementById('searchInput').addEventListener('input', searchTable);
+            
+            // Навигация
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('data-page');
+                    showPage(page);
+                });
+            });
+        }
+
+        // Генерация ID
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        // Сохранение данных в LocalStorage
+        function saveData() {
+            localStorage.setItem('dataItems', JSON.stringify(dataItems));
+        }
+
+        // Открытие модального окна для добавления данных
+        function openAddDataModal() {
+            editingItemId = null;
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemCategory').value = '';
+            document.getElementById('itemDate').valueAsDate = new Date();
+            document.getElementById('itemStatus').value = 'active';
+            document.getElementById('itemDescription').value = '';
+            document.getElementById('addModal').classList.add('active');
+        }
+
+        // Открытие модального окна авторизации
+        function openAuthModal() {
+            if (currentUser) {
+                logout();
+            } else {
+                document.getElementById('authModal').classList.add('active');
+            }
+        }
+
+        // Закрытие всех модальных окон
+        function closeAllModals() {
+            document.querySelectorAll('.modal-overlay').forEach(modal => {
+                modal.classList.remove('active');
+            });
+        }
+
+        // Сохранение элемента данных
+        function saveDataItem() {
+            const name = document.getElementById('itemName').value;
+            const category = document.getElementById('itemCategory').value;
+            const date = document.getElementById('itemDate').value;
+            const status = document.getElementById('itemStatus').value;
+            const description = document.getElementById('itemDescription').value;
+            
+            if (!name || !category || !date || !status) {
+                alert('Пожалуйста, заполните все обязательные поля');
+                return;
+            }
+            
+            if (editingItemId) {
+                // Редактирование существующей записи
+                const index = dataItems.findIndex(item => item.id === editingItemId);
+                if (index !== -1) {
+                    dataItems[index] = {
+                        ...dataItems[index],
+                        name,
+                        category,
+                        date,
+                        status,
+                        description
+                    };
+                }
+            } else {
+                // Добавление новой записи
+                const newItem = {
+                    id: generateId(),
+                    name,
+                    category,
+                    date,
+                    status,
+                    description
+                };
+                dataItems.push(newItem);
+            }
+            
+            saveData();
+            renderTable();
+            updateDashboard();
+            closeAllModals();
+        }
+
+        // Рендеринг таблицы
+        function renderTable() {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+            
+            dataItems.forEach(item => {
+                const row = document.createElement('tr');
+                
+                // Определение класса статуса
+                let statusClass = '';
+                let statusText = '';
+                if (item.status === 'active') {
+                    statusClass = 'status-active';
+                    statusText = 'Активен';
+                } else if (item.status === 'completed') {
+                    statusClass = 'status-completed';
+                    statusText = 'Завершен';
+                } else {
+                    statusClass = 'status-pending';
+                    statusText = 'В ожидании';
+                }
+                
+                row.innerHTML = `
+                    <td>${item.id.substring(0, 8)}</td>
+                    <td>${item.name}</td>
+                    <td>${item.category}</td>
+                    <td>${formatDate(item.date)}</td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <button class="action-btn edit" data-id="${item.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete" data-id="${item.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Добавление обработчиков для кнопок действий
+            document.querySelectorAll('.action-btn.edit').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const itemId = this.getAttribute('data-id');
+                    editItem(itemId);
+                });
+            });
+            
+            document.querySelectorAll('.action-btn.delete').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const itemId = this.getAttribute('data-id');
+                    deleteItem(itemId);
+                });
+            });
+        }
+
+        // Форматирование даты
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ru-RU');
+        }
+
+        // Редактирование элемента
+        function editItem(id) {
+            const item = dataItems.find(item => item.id === id);
+            if (item) {
+                editingItemId = id;
+                document.getElementById('itemName').value = item.name;
+                document.getElementById('itemCategory').value = item.category;
+                document.getElementById('itemDate').value = item.date;
+                document.getElementById('itemStatus').value = item.status;
+                document.getElementById('itemDescription').value = item.description || '';
+                document.getElementById('addModal').classList.add('active');
+            }
+        }
+
+        // Удаление элемента
+        function deleteItem(id) {
+            if (confirm('Вы уверены, что хотите удалить эту запись?')) {
+                dataItems = dataItems.filter(item => item.id !== id);
+                saveData();
+                renderTable();
+                updateDashboard();
+            }
+        }
+
+        // Поиск по таблице
+        function searchTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#tableBody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Обновление панели статистики
+        function updateDashboard() {
+            // Общее количество записей
+            document.getElementById('totalItems').textContent = dataItems.length;
+            
+            // Активные записи
+            const activeItems = dataItems.filter(item => item.status === 'active').length;
+            document.getElementById('activeItems').textContent = activeItems;
+            
+            // Количество категорий
+            const categories = [...new Set(dataItems.map(item => item.category))];
+            document.getElementById('categoriesCount').textContent = categories.length;
+            
+            // Записи за сегодня
+            const today = new Date().toISOString().split('T')[0];
+            const todayItems = dataItems.filter(item => item.date === today).length;
+            document.getElementById('todayItems').textContent = todayItems;
+            
+            // Последние 5 записей
+            const recentItemsContainer = document.getElementById('recentItems');
+            recentItemsContainer.innerHTML = '';
+            
+            const recentItems = [...dataItems].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+            
+            recentItems.forEach(item => {
+                const row = document.createElement('tr');
+                
+                // Определение класса статуса
+                let statusClass = '';
+                let statusText = '';
+                if (item.status === 'active') {
+                    statusClass = 'status-active';
+                    statusText = 'Активен';
+                } else if (item.status === 'completed') {
+                    statusClass = 'status-completed';
+                    statusText = 'Завершен';
+                } else {
+                    statusClass = 'status-pending';
+                    statusText = 'В ожидании';
+                }
+                
+                row.innerHTML = `
+                    <td>${item.id.substring(0, 8)}</td>
+                    <td>${item.name}</td>
+                    <td>${item.category}</td>
+                    <td>${formatDate(item.date)}</td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                `;
+                
+                recentItemsContainer.appendChild(row);
+            });
+        }
+
+        // Авторизация
+        function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                alert('Пожалуйста, введите email и пароль');
+                return;
+            }
+            
+            // В реальном приложении здесь был бы запрос к серверу
+            currentUser = {
+                id: generateId(),
+                name: "Пользователь",
+                email: email
+            };
+            
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            updateAuthUI();
+            closeAllModals();
+            alert('Вы успешно вошли в систему');
+        }
+
+        // Регистрация
+        function register() {
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const confirm = document.getElementById('regConfirm').value;
+            
+            if (!name || !email || !password || !confirm) {
+                alert('Пожалуйста, заполните все поля');
+                return;
+            }
+            
+            if (password !== confirm) {
+                alert('Пароли не совпадают');
+                return;
+            }
+            
+            // В реальном приложении здесь была бы регистрация на сервере
+            currentUser = {
+                id: generateId(),
+                name: name,
+                email: email
+            };
+            
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            updateAuthUI();
+            closeAllModals();
+            alert('Регистрация прошла успешно! Добро пожаловать!');
+        }
+
+        // Выход из системы
+        function logout() {
+            if (confirm('Вы уверены, что хотите выйти?')) {
+                currentUser = null;
+                localStorage.removeItem('currentUser');
+                updateAuthUI();
+            }
+        }
+
+        // Обновление UI авторизации
+        function updateAuthUI() {
+            const authButton = document.getElementById('authButton');
+            const authSection = document.getElementById('authSection');
+            
+            if (currentUser) {
+                authSection.innerHTML = `
+                    <div class="user-profile">
+                        <div class="avatar">${currentUser.name.charAt(0)}</div>
+                        <span>${currentUser.name}</span>
+                        <button class="auth-btn" id="authButton" style="margin-left: 10px;">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Выйти</span>
+                        </button>
+                    </div>
+                `;
+                
+                // Добавляем обработчик события для новой кнопки
+                document.getElementById('authButton').addEventListener('click', openAuthModal);
+            } else {
+                authSection.innerHTML = `
+                    <button class="auth-btn" id="authButton">
+                        <i class="fas fa-user"></i>
+                        <span>Войти</span>
+                    </button>
+                `;
+                
+                // Добавляем обработчик события для кнопки входа
+                document.getElementById('authButton').addEventListener('click', openAuthModal);
+            }
+        }
+
+        // Переключение страниц
+        function showPage(pageName) {
+            // Скрыть все страницы
+            document.getElementById('homePage').style.display = 'none';
+            document.getElementById('tablePage').style.display = 'none';
+            document.getElementById('dashboardPage').style.display = 'none';
+            
+            // Показать запрошенную страницу
+            if (pageName === 'home') {
+                document.getElementById('homePage').style.display = 'flex';
+            } else if (pageName === 'table') {
+                document.getElementById('tablePage').style.display = 'block';
+                renderTable();
+            } else if (pageName === 'dashboard') {
+                document.getElementById('dashboardPage').style.display = 'block';
+                updateDashboard();
+            }
+        }
+
+        // Закрытие модального окна при клике вне его
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                closeAllModals();
+            }
+        });
+    </script>
+</body>
+</html>
